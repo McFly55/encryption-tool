@@ -26,7 +26,7 @@ verschlüsselte Datei lässt sich mit demselben Passwort wieder entschlüsseln.
 - [`cryptography`](https://cryptography.io/) – installieren mit:
 
   ```bash
-  pip install cryptography
+  sudo pacman -S python-cryptography
   ```
 
 - Für die grafische Oberfläche zusätzlich Tkinter. Auf Arch Linux:
