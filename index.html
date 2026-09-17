@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Encrypter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="app__header">
+      <div class="brand">
+        <div class="brand__mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
+        </div>
+        <div>
+          <h1 class="brand__title">Encrypter</h1>
+          <p class="brand__subtitle">Text und Dateien sicher ver- und entschlüsseln</p>
+        </div>
+      </div>
+    </header>
+
+    <main class="app__main">
+      <!-- Modus -->
+      <div class="segmented" role="tablist" aria-label="Aktion">
+        <button class="segmented__btn is-active" role="tab" aria-selected="true" data-mode="encrypt">Verschlüsseln</button>
+        <button class="segmented__btn" role="tab" aria-selected="false" data-mode="decrypt">Entschlüsseln</button>
+      </div>
+
+      <!-- Eingabeart -->
+      <div class="segmented segmented--sub" role="tablist" aria-label="Eingabeart">
+        <button class="segmented__btn is-active" role="tab" aria-selected="true" data-input="text">Text</button>
+        <button class="segmented__btn" role="tab" aria-selected="false" data-input="file">Datei</button>
+      </div>
+
+      <form id="crypto-form" class="card" novalidate>
+        <!-- Passwort -->
+        <div class="field">
+          <label class="field__label" for="password">Passwort</label>
+          <div class="field__control">
+            <input class="input" type="password" id="password" placeholder="Mindestens 8 Zeichen" autocomplete="off" />
+            <button class="btn btn--ghost btn--icon" type="button" id="toggle-pw" aria-label="Passwort anzeigen" title="Passwort anzeigen">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="eye-icon">
+                <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            </button>
+          </div>
+          <p class="hint" id="pw-hint" hidden></p>
+        </div>
+
+        <!-- Text-Eingabe -->
+        <div class="field" id="text-field">
+          <label class="field__label" for="text-input" id="text-label">Zu verschlüsselnder Text</label>
+          <textarea class="input input--area" id="text-input" rows="6" placeholder="Text hier eingeben oder einfügen…"></textarea>
+        </div>
+
+        <!-- Datei-Eingabe -->
+        <div class="field" id="file-field" hidden>
+          <label class="field__label" for="file-input">Datei auswählen</label>
+          <label class="dropzone" id="dropzone">
+            <input class="dropzone__input" type="file" id="file-input" />
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <path d="M7 10l5-5 5 5" />
+              <path d="M12 5v12" />
+            </svg>
+            <span class="dropzone__text">Datei hierher ziehen oder klicken zum Auswählen</span>
+            <span class="dropzone__filename" id="file-name"></span>
+          </label>
+        </div>
+
+        <!-- Aktion -->
+        <div class="actions">
+          <button class="btn btn--primary" type="submit" id="action-btn">Verschlüsseln</button>
+          <button class="btn btn--ghost" type="button" id="reset-btn">Zurücksetzen</button>
+        </div>
+
+        <!-- Status -->
+        <p class="status" id="status" role="status" aria-live="polite" hidden></p>
+      </form>
+
+      <!-- Ergebnis -->
+      <section class="card result" id="result" hidden>
+        <div class="result__head">
+          <h2 class="result__title">Ergebnis</h2>
+          <div class="result__tools">
+            <button class="btn btn--ghost btn--sm" type="button" id="copy-btn">Kopieren</button>
+            <button class="btn btn--ghost btn--sm" type="button" id="download-btn" hidden>Herunterladen</button>
+          </div>
+        </div>
+        <textarea class="input input--area result__text" id="result-text" rows="6" readonly></textarea>
+      </section>
+    </main>
+
+    <footer class="app__footer">
+      <p>Verschlüsselung erfolgt vollständig lokal in deinem Browser (AES-256-GCM). Es werden keine Daten übertragen.</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
