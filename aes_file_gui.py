@@ -43,8 +43,8 @@ class CryptoApp:
     def __init__(self, root: Tk):
         self.root = root
         self.root.title(APP_TITLE)
-        self.root.geometry("640x520")
-        self.root.minsize(560, 480)
+        self.root.geometry("620x580")
+        self.root.minsize(560, 560)
 
         self.mode = StringVar(value="encrypt")
         self.file_path = StringVar()
@@ -58,10 +58,12 @@ class CryptoApp:
 
         self._build_ui()
         self._apply_mode_change()
+        self._fit_window_to_content()
 
     def _build_ui(self) -> None:
-        main = ttk.Frame(self.root, padding=PAD)
-        main.pack(fill=BOTH, expand=True)
+        self.main_frame = ttk.Frame(self.root, padding=PAD)
+        self.main_frame.pack(fill=BOTH, expand=True)
+        main = self.main_frame
 
         # ---- Modusauswahl ----
         mode_frame = ttk.LabelFrame(main, text="Was moechtest du tun?", padding=PAD)
@@ -125,9 +127,19 @@ class CryptoApp:
         self.run_btn = ttk.Button(action_frame, text="Verschluesseln", command=self.run)
         self.run_btn.pack(side=RIGHT)
 
-        main.pack_propagate(True)
-
     # ---- Hilfsfunktionen ----
+    def _fit_window_to_content(self) -> None:
+        """Passt die Fensterhoehe an den tatsaechlich benoetigten Inhalt an,
+        sodass alle Elemente (inkl. Status und Button) sofort sichtbar sind."""
+        self.root.update_idletasks()
+        needed_w = self.main_frame.winfo_reqwidth()
+        needed_h = self.main_frame.winfo_reqheight()
+        # Fensterrahmen/-titel beruecksichtigen (kleine Pauschale)
+        extra = 40
+        width = max(needed_w + 2 * PAD, 620)
+        height = max(needed_h + extra, 560)
+        self.root.geometry(f"{int(width)}x{int(height)}")
+
     def _toggle_pw_visibility(self) -> None:
         show = "" if self.show_var.get() == "yes" else "*"
         self.pw_entry.configure(show=show)
