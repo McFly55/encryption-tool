@@ -29,7 +29,38 @@ verschlüsselte Datei lässt sich mit demselben Passwort wieder entschlüsseln.
   pip install cryptography
   ```
 
+- Für die grafische Oberfläche zusätzlich Tkinter. Auf Arch Linux:
+
+  ```bash
+  sudo pacman -S tk
+  ```
+
 ## Verwendung
+
+### Grafische Oberfläche (für alle, die CLI vermeiden wollen)
+
+```bash
+python3 aes_file_gui.py
+```
+
+Die GUI bietet:
+
+- Umschalten zwischen **Verschlüsseln** und **Entschlüsseln** per Mausklick.
+- Dateiauswahl per „Durchsuchen …“-Dialog.
+- Passwort-Eingabe (mit Bestätigung beim Verschlüsseln) und
+  ein-/ausblendbarem Passwortfeld.
+- Live-Fortschrittsanzeige mit Größe und Prozentwert.
+- Klare Fehlermeldungen (falsches Passwort, fehlende Datei, ungültiges Format)
+  als Dialogfenster.
+- Bestehende Zieldateien werden beim Überschreiben Rückfrage gestellt.
+
+Auf Arch Linux wird dafür das Paket `tk` benötigt:
+
+```bash
+sudo pacman -S tk
+```
+
+### Kommandozeile
 
 ```bash
 # Verschlüsseln (Passwort wird zweimal abgefragt)

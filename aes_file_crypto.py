@@ -6,6 +6,7 @@ import getpass
 import os
 import sys
 from pathlib import Path
+from typing import Callable, Optional
 
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
@@ -74,8 +75,13 @@ def _finish_progress(action: str, last_pct: int) -> None:
         sys.stdout.flush()
 
 
-def _read_with_progress(f, action: str, total: int) -> bytes:
-    """Liest die Datei in Bloecken und zeigt dabei den Fortschritt an."""
+ProgressCallback = Optional[Callable[[int, int], None]]
+
+
+def _read_with_progress(f, action: str, total: int, on_progress: ProgressCallback = None) -> bytes:
+    """Liest die Datei in Bloecken und zeigt dabei den Fortschritt an.
+    'on_progress(done_bytes, total_bytes)' ist ein optionaler Callback
+    (z. B. fuer eine GUI-Fortschrittsanzeige)."""
     data = bytearray()
     done = 0
     last_pct = -1
@@ -86,12 +92,15 @@ def _read_with_progress(f, action: str, total: int) -> bytes:
         data.extend(chunk)
         done += len(chunk)
         last_pct = _progress(action, done, total, last_pct)
+        if on_progress is not None:
+            on_progress(done, total)
     _finish_progress(action, last_pct)
     return bytes(data)
 
 
-def encrypt_file(src: Path, dst: Path, password: str) -> None:
-    """Verschluesselt 'src' mit AES-256-GCM und schreibt das Ergebnis nach 'dst'."""
+def encrypt_file(src: Path, dst: Path, password: str, on_progress: ProgressCallback = None) -> None:
+    """Verschluesselt 'src' mit AES-256-GCM und schreibt das Ergebnis nach 'dst'.
+    'on_progress(done_bytes, total_bytes)' ist ein optionaler Callback."""
     if not src.is_file():
         raise CryptoError(f"Die Quelldatei existiert nicht: {src}")
     if dst.exists():
@@ -105,7 +114,7 @@ def encrypt_file(src: Path, dst: Path, password: str) -> None:
     aesgcm = AESGCM(key)
 
     with src.open("rb") as f:
-        plaintext = _read_with_progress(f, "Verschluesselung", total)
+        plaintext = _read_with_progress(f, "Verschluesselung", total, on_progress)
 
     # GCM authentifiziert die gesamten Daten in einem Stück.
     ciphertext = aesgcm.encrypt(nonce, plaintext, MAGIC)
@@ -117,8 +126,9 @@ def encrypt_file(src: Path, dst: Path, password: str) -> None:
         f.write(ciphertext)
 
 
-def decrypt_file(src: Path, dst: Path, password: str) -> None:
-    """Entschluesselt eine mit encrypt_file() erzeugte Datei nach 'dst'."""
+def decrypt_file(src: Path, dst: Path, password: str, on_progress: ProgressCallback = None) -> None:
+    """Entschluesselt eine mit encrypt_file() erzeugte Datei nach 'dst'.
+    'on_progress(done_bytes, total_bytes)' ist ein optionaler Callback."""
     if not src.is_file():
         raise CryptoError(f"Die Quelldatei existiert nicht: {src}")
     if dst.exists():
@@ -136,7 +146,7 @@ def decrypt_file(src: Path, dst: Path, password: str) -> None:
         nonce = f.read(NONCE_LENGTH)
         if len(salt) != SALT_LENGTH or len(nonce) != NONCE_LENGTH:
             raise CryptoError("Die Datei ist beschaedigt (Header zu kurz).")
-        ciphertext = _read_with_progress(f, "Entschluesselung", total)
+        ciphertext = _read_with_progress(f, "Entschluesselung", total, on_progress)
 
     key = derive_key(password, salt)
     aesgcm = AESGCM(key)
